@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUDHRA Solar Panel Booking</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #cbd5e1;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); margin: 0; padding: 0; color: #1e293b; }
+
+        /* Fixed Top Header with DP */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--secondary);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .fixed-header img {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            background: #fff;
+        }
+        .fixed-header h1 {
+            margin: 0;
+            font-size: 1.35rem;
+            letter-spacing: 0.5px;
+        }
+        .fixed-header span { color: var(--primary); }
+
+        /* Main Form Container */
+        .container {
+            max-width: 850px;
+            margin: 100px auto 40px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        h2.section-title {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            margin-top: 25px;
+            margin-bottom: 18px;
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: #334155; }
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        input[type="file"] { padding: 7px; background: #f1f5f9; }
+        .submit-btn {
+            margin-top: 30px;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover { background: var(--primary-dark); color: #fff; }
+        .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        #statusMsg {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Header with DP -->
+    <header class="fixed-header">
+        <img src="rudhralogo.jpeg" alt="RUDHRA Solar Logo">
+        <div>
+            <h1><span>RUDHRA</span> SOLAR PANEL BOOKING</h1>
+            <small style="color: #cbd5e1;">Clean Energy Registration Portal</small>
+        </div>
+    </header>
+
+    <div class="container">
+        <form id="solarForm">
+            <h2 class="section-title">1. System & Agent Selection</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Required Capacity *</label>
+                    <select id="capacity" required>
+                        <option value="">-- Select Capacity --</option>
+                        <option value="3kW">3 kW</option>
+                        <option value="5kW">5 kW</option>
+                        <option value="10kW">10 kW</option>
+                        <option value="15kW">15 kW</option>
+                        <option value="20kW">20 kW</option>
+                        <option value="30kW">30 kW</option>
+                        <option value="50kW">50 kW</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Agent Selection *</label>
+                    <select id="agent_name" required>
+                        <option value="">-- Select Agent --</option>
+                        <option value="RAVI">RAVI</option>
+                        <option value="RAGAVENDRA">RAGAVENDRA</option>
+                        <option value="SANTHOS">SANTHOS</option>
+                        <option value="ASHOK">ASHOK</option>
+                        <option value="ANIL">ANIL</option>
+ 			<option value="SATHYAM">SATHYAM</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="section-title">2. Customer Personal Details</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="full_name" placeholder="Enter Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number *</label>
+                    <input type="tel" id="mobile_no" pattern="[0-9]{10}" placeholder="10-digit Mobile No" required>
+                </div>
+                <div class="form-group">
+                    <label>Email ID</label>
+                    <input type="email" id="email_id" placeholder="example@email.com">
+                </div>
+            </div>
+
+            <h2 class="section-title">3. Installation Address</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label>House No *</label>
+                    <input type="text" id="house_no" placeholder="D.No / Flat No" required>
+                </div>
+                <div class="form-group">
+                    <label>Village / Town *</label>
+                    <input type="text" id="village" placeholder="Village Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Mandal *</label>
+                    <input type="text" id="mandal" placeholder="Mandal Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Pincode *</label>
+                    <input type="text" id="pincode" pattern="[0-9]{6}" placeholder="6-digit Pincode" required>
+                </div>
+                <div class="form-group">
+                    <label>District *</label>
+                    <input type="text" id="district" placeholder="District Name" required>
+                </div>
+                <div class="form-group">
+                    <label>State *</label>
+                    <select id="state" required>
+                        <option value="">-- Select State --</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Kerala">Kerala</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="section-title">4. KYC, Bank & Site Documents</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Aadhar Number *</label>
+                    <input type="text" id="aadhar_no" pattern="[0-9]{12}" placeholder="12-digit Aadhar No" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Aadhar Card *</label>
+                    <input type="file" id="aadhar_file" accept="image/*,.pdf" required>
+                </div>
+                <div class="form-group">
+                    <label>Electricity Consumer Number *</label>
+                    <input type="text" id="electricity_consumer_no" placeholder="USC / Service Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Bank Account Number *</label>
+                    <input type="text" id="bank_ac_no" placeholder="Bank A/C No" required>
+                </div>
+                <div class="form-group">
+                    <label>IFSC Code *</label>
+                    <input type="text" id="ifsc_code" placeholder="e.g., SBIN0001234" style="text-transform: uppercase;" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Bank Passbook / Cancelled Cheque *</label>
+                    <input type="file" id="bank_file" accept="image/*,.pdf" required>
+                </div>
+                <div class="form-group">
+                    <label>PAN Number *</label>
+                    <input type="text" id="pan_no" placeholder="e.g., ABCDE1234F" style="text-transform: uppercase;" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload PAN Card *</label>
+                    <input type="file" id="pan_file" accept="image/*,.pdf" required>
+                </div>
+                <div class="form-group">
+                    <label>Site Installation Photo *</label>
+                    <input type="file" id="site_photo" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload House Tax Receipt / Document (Optional)</label>
+                    <input type="file" id="house_tax_file" accept="image/*,.pdf">
+                    <small style="color:#64748b;margin-top:5px;">Upload a house/property tax receipt or document (image or PDF).</small>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">SUBMIT BOOKING</button>
+            <div id="statusMsg"></div>
+        </form>
+    </div>
+
+    <script>
+        // REPLACE WITH YOUR SUPABASE PROJECT DETAILS
+        const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function uploadFile(fileInputId, folderName) {
+            const fileInput = document.getElementById(fileInputId);
+            const file = fileInput.files[0];
+            if (!file) return null;
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folderName}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+            const { data, error } = await supabaseClient.storage
+                .from('rudhra-docs')
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            const { data: urlData } = supabaseClient.storage
+                .from('rudhra-docs')
+                .getPublicUrl(fileName);
+
+            return urlData.publicUrl;
+        }
+
+        document.getElementById('solarForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const statusMsg = document.getElementById('statusMsg');
+
+            btn.disabled = true;
+            btn.innerText = 'Uploading Documents & Saving...';
+            statusMsg.style.display = 'none';
+
+            try {
+                // Upload all documents concurrently. House tax document is optional.
+                const [aadharUrl, bankUrl, panUrl, siteUrl, houseTaxUrl] = await Promise.all([
+                    uploadFile('aadhar_file', 'aadhar'),
+                    uploadFile('bank_file', 'bank'),
+                    uploadFile('pan_file', 'pan'),
+                    uploadFile('site_photo', 'site'),
+                    uploadFile('house_tax_file', 'house_tax')
+                ]);
+
+                const formData = {
+                    capacity: document.getElementById('capacity').value,
+                    agent_name: document.getElementById('agent_name').value,
+                    full_name: document.getElementById('full_name').value,
+                    mobile_no: document.getElementById('mobile_no').value,
+                    email_id: document.getElementById('email_id').value,
+                    house_no: document.getElementById('house_no').value,
+                    village: document.getElementById('village').value,
+                    mandal: document.getElementById('mandal').value,
+                    pincode: document.getElementById('pincode').value,
+                    district: document.getElementById('district').value,
+                    state: document.getElementById('state').value,
+                    aadhar_no: document.getElementById('aadhar_no').value,
+                    aadhar_doc_url: aadharUrl,
+                    electricity_consumer_no: document.getElementById('electricity_consumer_no').value,
+                    bank_ac_no: document.getElementById('bank_ac_no').value,
+                    ifsc_code: document.getElementById('ifsc_code').value.toUpperCase(),
+                    bank_doc_url: bankUrl,
+                    pan_no: document.getElementById('pan_no').value.toUpperCase(),
+                    pan_doc_url: panUrl,
+                    site_photo_url: siteUrl,
+                    house_tax_doc_url: houseTaxUrl
+                };
+
+                const { error } = await supabaseClient
+                    .from('rudhra_solar_bookings')
+                    .insert([formData]);
+
+                if (error) throw error;
+
+                statusMsg.style.display = 'block';
+                statusMsg.style.background = '#dcfce7';
+                statusMsg.style.color = '#166534';
+                statusMsg.innerText = '✅ Booking Submitted Successfully! RUDHRA Solar team will contact you soon.';
+                document.getElementById('solarForm').reset();
+
+            } catch (err) {
+                console.error(err);
+                statusMsg.style.display = 'block';
+                statusMsg.style.background = '#fee2e2';
+                statusMsg.style.color = '#991b1b';
+                statusMsg.innerText = '❌ Error: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'SUBMIT BOOKING';
+            }
+        });
+    </script>
+</body>
+</html>
