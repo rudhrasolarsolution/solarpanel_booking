@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
   <title>RUDHRA Solar - Customer Booking Form</title>
+
+  <!-- External libraries are loaded from CDN; all application code is in this HTML file. -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
       --primary: #f59e0b;
@@ -16,6 +20,8 @@
       --border: #cbd5e1;
       --text: #1e293b;
       --muted: #64748b;
+      --danger: #dc2626;
+      --success: #166534;
     }
 
     * {
@@ -23,14 +29,24 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    html,
     body {
+      width: 100%;
+      max-width: 100%;
+      min-height: 100%;
       margin: 0;
+      overflow-x: hidden;
+    }
+
+    body {
       padding: 0;
       background: var(--bg);
       color: var(--text);
     }
 
     .header {
+      width: 100%;
+      min-width: 0;
       background: var(--secondary);
       color: #ffffff;
       padding: 14px 24px;
@@ -43,6 +59,7 @@
     .header img {
       width: 48px;
       height: 48px;
+      flex: 0 0 48px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--primary);
@@ -52,6 +69,8 @@
     .header h1 {
       margin: 0;
       font-size: 1.25rem;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
     }
 
     .header h1 span {
@@ -62,15 +81,20 @@
       color: #cbd5e1;
       display: block;
       margin-top: 2px;
+      font-size: 0.82rem;
+      line-height: 1.4;
     }
 
     .container {
+      width: 100%;
       max-width: 920px;
       margin: 28px auto 48px;
       padding: 0 16px;
     }
 
     .form-card {
+      width: 100%;
+      min-width: 0;
       background: var(--card);
       border-radius: 12px;
       padding: 28px;
@@ -86,6 +110,7 @@
       padding: 8px 12px;
       border-radius: 6px;
       font-weight: 600;
+      line-height: 1.5;
     }
 
     .section-title {
@@ -102,13 +127,16 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
+      width: 100%;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
+      min-width: 0;
+      width: 100%;
     }
 
     .form-group label {
@@ -119,33 +147,42 @@
     }
 
     .form-group label .req {
-      color: #dc2626;
+      color: var(--danger);
     }
 
     .form-group input,
     .form-group select {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 44px;
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 0.92rem;
       background: #ffffff;
+      color: var(--text);
     }
 
     .form-group input[type="file"] {
       padding: 7px;
       background: #f8fafc;
       font-size: 0.84rem;
+      overflow: hidden;
     }
 
     .form-group input:focus,
     .form-group select:focus {
       outline: none;
       border-color: var(--primary-dark);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
     }
 
     .submit-btn {
       margin-top: 26px;
       width: 100%;
+      min-height: 48px;
       padding: 13px;
       background: var(--primary);
       color: var(--secondary);
@@ -154,12 +191,16 @@
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
     }
 
     .submit-btn:hover:not(:disabled) {
       background: var(--primary-dark);
       color: #ffffff;
+    }
+
+    .submit-btn:active:not(:disabled) {
+      transform: translateY(1px);
     }
 
     .submit-btn:disabled {
@@ -169,18 +210,21 @@
     }
 
     .status-box {
+      width: 100%;
       margin-top: 16px;
       padding: 12px 14px;
       border-radius: 8px;
       font-size: 0.92rem;
       font-weight: 600;
       display: none;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
     }
 
     .status-box.success {
       display: block;
       background: #dcfce7;
-      color: #166534;
+      color: var(--success);
       border: 1px solid #86efac;
     }
 
@@ -199,6 +243,7 @@
     }
 
     .receipt-btn {
+      min-height: 44px;
       padding: 10px 16px;
       background: var(--secondary);
       color: #ffffff;
@@ -212,12 +257,161 @@
     .receipt-btn:hover {
       background: #1e293b;
     }
+
+    /* Tablet layout */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 8px;
+      }
+
+      .form-card {
+        padding: 20px 16px;
+      }
+
+      .grid {
+        gap: 13px;
+      }
+    }
+
+    /* Mobile: edge-to-edge card and one full-width field per row */
+    @media (max-width: 600px) {
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      .header {
+        padding: 11px 10px;
+        gap: 10px;
+      }
+
+      .header img {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+      }
+
+      .header h1 {
+        font-size: 17px;
+      }
+
+      .header small {
+        font-size: 11px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .form-card {
+        width: 100%;
+        padding: 16px 12px 24px;
+        border-radius: 0;
+        box-shadow: none;
+        border: 0;
+      }
+
+      .required-note {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .section-title {
+        margin-top: 22px;
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+        width: 100%;
+      }
+
+      .form-group,
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .form-group label {
+        font-size: 14px;
+      }
+
+      .form-group input,
+      .form-group select {
+        height: 46px;
+        padding: 10px;
+        border-radius: 7px;
+        /* 16px avoids automatic zoom when focusing fields on iPhone. */
+        font-size: 16px;
+      }
+
+      .form-group input[type="file"] {
+        height: auto;
+        min-height: 46px;
+        padding: 8px;
+        font-size: 13px;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 14px 8px;
+        font-size: 14px;
+        line-height: 1.5;
+        border-radius: 7px;
+      }
+
+      .receipt-actions {
+        width: 100%;
+      }
+
+      .receipt-btn {
+        width: 100%;
+        font-size: 13px;
+      }
+
+      .status-box {
+        width: 100%;
+        font-size: 13px;
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .header h1 {
+        font-size: 15px;
+      }
+
+      .form-card {
+        padding: 13px 9px 20px;
+      }
+
+      .section-title {
+        font-size: 15px;
+      }
+
+      .form-group label {
+        font-size: 13px;
+      }
+
+      .submit-btn {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
-
   <header class="header">
-    <img id="brandLogo" src="rudhralogo.jpeg" alt="RUDHRA Logo" />
+    <img id="brandLogo" src="rudhra_logo.jpeg" alt="RUDHRA Logo" />
     <div>
       <h1><span>RUDHRA</span> SOLAR BOOKING FORM</h1>
       <small>Submit Rooftop Solar Booking Details &amp; Documents</small>
@@ -258,17 +452,17 @@
 
         <div class="form-group">
           <label for="full_name">Full Name <span class="req">*</span></label>
-          <input type="text" id="full_name" required placeholder="Enter full name" />
+          <input type="text" id="full_name" required autocomplete="name" placeholder="Enter full name" />
         </div>
 
         <div class="form-group">
           <label for="mobile_no">Mobile Number <span class="req">*</span></label>
-          <input type="tel" id="mobile_no" required pattern="[0-9]{10}" maxlength="10" title="Enter a valid 10-digit mobile number" placeholder="10-digit mobile number" />
+          <input type="tel" id="mobile_no" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" title="Enter a valid 10-digit mobile number" placeholder="10-digit mobile number" />
         </div>
 
         <div class="form-group">
           <label for="email_id">Email ID <span class="req">*</span></label>
-          <input type="email" id="email_id" required placeholder="Enter email address" />
+          <input type="email" id="email_id" required autocomplete="email" placeholder="Enter email address" />
         </div>
 
         <div class="form-group">
@@ -306,7 +500,7 @@
 
         <div class="form-group">
           <label for="pincode">PIN Code <span class="req">*</span></label>
-          <input type="text" id="pincode" required pattern="[0-9]{6}" maxlength="6" title="Enter a valid 6-digit PIN code" placeholder="6-digit PIN code" />
+          <input type="text" id="pincode" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" title="Enter a valid 6-digit PIN code" placeholder="6-digit PIN code" />
         </div>
       </div>
 
@@ -314,22 +508,22 @@
       <div class="grid">
         <div class="form-group">
           <label for="aadhar_no">Aadhar Number <span class="req">*</span></label>
-          <input type="text" id="aadhar_no" required pattern="[0-9]{12}" maxlength="12" title="Enter a valid 12-digit Aadhar number" placeholder="12-digit Aadhar number" />
+          <input type="text" id="aadhar_no" required inputmode="numeric" pattern="[0-9]{12}" maxlength="12" title="Enter a valid 12-digit Aadhar number" placeholder="12-digit Aadhar number" />
         </div>
 
         <div class="form-group">
           <label for="pan_no">PAN Number <span class="req">*</span></label>
-          <input type="text" id="pan_no" required maxlength="10" style="text-transform: uppercase;" placeholder="Enter PAN number" />
+          <input type="text" id="pan_no" required maxlength="10" minlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" style="text-transform: uppercase;" title="Enter a valid 10-character PAN number" placeholder="Enter PAN number" />
         </div>
 
         <div class="form-group">
           <label for="bank_ac_no">Bank Account No <span class="req">*</span></label>
-          <input type="text" id="bank_ac_no" required placeholder="Enter bank account number" />
+          <input type="text" id="bank_ac_no" required inputmode="numeric" placeholder="Enter bank account number" />
         </div>
 
         <div class="form-group">
           <label for="ifsc_code">IFSC Code <span class="req">*</span></label>
-          <input type="text" id="ifsc_code" required maxlength="11" style="text-transform: uppercase;" placeholder="Enter IFSC code" />
+          <input type="text" id="ifsc_code" required maxlength="11" minlength="11" pattern="[A-Za-z]{4}0[A-Za-z0-9]{6}" style="text-transform: uppercase;" title="Enter a valid 11-character IFSC code" placeholder="Enter IFSC code" />
         </div>
       </div>
 
@@ -367,7 +561,7 @@
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">SUBMIT BOOKING &amp; DOWNLOAD RECEIPT</button>
-      <div class="status-box" id="statusBox" role="status"></div>
+      <div class="status-box" id="statusBox" role="status" aria-live="polite"></div>
       <div class="receipt-actions" id="receiptActions">
         <button type="button" class="receipt-btn" id="reDownloadBtn">Download Receipt Again (PDF)</button>
       </div>
@@ -375,10 +569,14 @@
   </main>
 
   <script>
+    'use strict';
+
+    // Supabase project configuration
     const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
     const STORAGE_BUCKET = 'rudhra-docs';
     const BOOKINGS_TABLE = 'rudhra_solar_bookings';
+
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const UPLOAD_MAP = [
@@ -407,43 +605,51 @@
 
     async function loadLogoDataUrl() {
       try {
-        const res = await fetch('rudhralogo.jpeg');
-        if (!res.ok) return null;
-        const blob = await res.blob();
+        const response = await fetch('rudhra_logo.jpeg');
+        if (!response.ok) return null;
+        const blob = await response.blob();
         return await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result);
           reader.onerror = () => resolve(null);
           reader.readAsDataURL(blob);
         });
-      } catch (_) {
+      } catch (error) {
+        console.warn('Logo could not be loaded for the PDF receipt:', error);
         return null;
       }
     }
 
     async function generateAndDownloadReceipt(bookingData) {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error('PDF library did not load. Check your internet connection and try again.');
+      }
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
       const pageWidth = 210;
       const margin = 14;
       const contentWidth = pageWidth - margin * 2;
 
-      // Top Brand Banner
+      // Top brand banner
       doc.setFillColor(15, 23, 42);
       doc.rect(0, 0, pageWidth, 38, 'F');
 
-      // Accent Stripe
+      // Accent stripe
       doc.setFillColor(245, 158, 11);
       doc.rect(0, 38, pageWidth, 2.5, 'F');
 
-      // Optional Company Logo
+      // Optional company logo
       const logoDataUrl = await loadLogoDataUrl();
       let textStartX = margin;
       if (logoDataUrl) {
         try {
-          doc.addImage(logoDataUrl, 'JPEG', margin, 6, 25, 25);
+          const logoFormat = String(logoDataUrl).startsWith('data:image/png') ? 'PNG' : 'JPEG';
+          doc.addImage(logoDataUrl, logoFormat, margin, 6, 25, 25);
           textStartX = margin + 30;
-        } catch (_) {}
+        } catch (error) {
+          console.warn('Could not add logo to receipt:', error);
+        }
       }
 
       doc.setTextColor(245, 158, 11);
@@ -462,7 +668,7 @@
       doc.setFontSize(10);
       doc.text('SOLAR BOOKING ACKNOWLEDGEMENT RECEIPT', textStartX, 33.5);
 
-      // Receipt Meta Bar
+      // Receipt meta bar
       let y = 47;
       doc.setFillColor(241, 245, 249);
       doc.setDrawColor(203, 213, 225);
@@ -481,11 +687,19 @@
       doc.setFontSize(9);
       doc.setTextColor(71, 85, 105);
       doc.text(`Date & Time: ${submittedAt}`, margin + 4, y + 12.5);
-      doc.text(`Assigned Agent: ${bookingData.agent_name}`, pageWidth - margin - 4, y + 12.5, { align: 'right' });
+      doc.text(`Assigned Agent: ${bookingData.agent_name || 'N/A'}`, pageWidth - margin - 4, y + 12.5, { align: 'right' });
 
       y += 23;
 
+      const ensureSpace = (neededHeight) => {
+        if (y + neededHeight > 270) {
+          doc.addPage();
+          y = 18;
+        }
+      };
+
       const drawSectionHeader = (title) => {
+        ensureSpace(10);
         doc.setFillColor(15, 23, 42);
         doc.rect(margin, y, contentWidth, 7.5, 'F');
         doc.setTextColor(245, 158, 11);
@@ -496,9 +710,12 @@
       };
 
       const drawRow = (label, value, isAlt = false) => {
-        const displayValue = String(value || 'N/A');
-        const wrappedLines = doc.splitTextToSize(displayValue, contentWidth - 68);
+        const displayValue = String(value ?? '').trim() || 'N/A';
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const wrappedLines = doc.splitTextToSize(displayValue, contentWidth - 72);
         const rowHeight = Math.max(7.5, wrappedLines.length * 4.8 + 3);
+        ensureSpace(rowHeight);
 
         doc.setFillColor(isAlt ? 248 : 255, isAlt ? 250 : 255, isAlt ? 252 : 255);
         doc.setDrawColor(226, 232, 240);
@@ -511,12 +728,13 @@
 
         doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'normal');
-        doc.text(wrappedLines, margin + 65, y + 5);
+        doc.setFontSize(9);
+        doc.text(wrappedLines, margin + 68, y + 5);
 
         y += rowHeight;
       };
 
-      // Section 1: Customer & Solar System Details
+      // Section 1: Customer and solar system details
       drawSectionHeader('1. CUSTOMER & SYSTEM BOOKING DETAILS');
       drawRow('Customer Full Name', bookingData.full_name, false);
       drawRow('Mobile Number', bookingData.mobile_no, true);
@@ -527,14 +745,14 @@
 
       y += 5;
 
-      // Section 2: Installation Address
+      // Section 2: Installation address
       drawSectionHeader('2. INSTALLATION SITE ADDRESS');
-      const fullAddress = `${bookingData.house_no}, ${bookingData.village}, Mandal: ${bookingData.mandal}, Dist: ${bookingData.district}, ${bookingData.state} - ${bookingData.pincode}`;
+      const fullAddress = `${bookingData.house_no || ''}, ${bookingData.village || ''}, Mandal: ${bookingData.mandal || ''}, Dist: ${bookingData.district || ''}, ${bookingData.state || ''} - ${bookingData.pincode || ''}`;
       drawRow('Complete Address', fullAddress, false);
 
       y += 5;
 
-      // Section 3: KYC & Bank Details
+      // Section 3: KYC and bank details
       drawSectionHeader('3. KYC & BANK ACCOUNT DETAILS');
       drawRow('Aadhar Number', bookingData.aadhar_no, false);
       drawRow('PAN Number', bookingData.pan_no, true);
@@ -543,23 +761,24 @@
 
       y += 5;
 
-      // Section 4: Uploaded Documents Checklist
+      // Section 4: Uploaded documents checklist
       drawSectionHeader('4. SUBMITTED DOCUMENTS VERIFICATION');
       const docsSummary = [
-        ['Aadhar Card Document', bookingData.aadhar_doc_url ? 'Uploaded & Attached' : 'Missing'],
-        ['PAN Card Document', bookingData.pan_doc_url ? 'Uploaded & Attached' : 'Missing'],
-        ['Bank Proof Document', bookingData.bank_doc_url ? 'Uploaded & Attached' : 'Missing'],
-        ['Site Installation Photo', bookingData.site_photo_url ? 'Uploaded & Attached' : 'Missing'],
-        ['House Tax Document', bookingData.house_tax_doc_url ? 'Uploaded & Attached' : 'Missing'],
-        ['Customer Signature', bookingData.customer_sign_url ? 'Uploaded & Attached' : 'Missing']
+        ['Aadhar Card Document', bookingData.aadhar_doc_url ? 'Uploaded' : 'Missing'],
+        ['PAN Card Document', bookingData.pan_doc_url ? 'Uploaded' : 'Missing'],
+        ['Bank Proof Document', bookingData.bank_doc_url ? 'Uploaded' : 'Missing'],
+        ['Site Installation Photo', bookingData.site_photo_url ? 'Uploaded' : 'Missing'],
+        ['House Tax Document', bookingData.house_tax_doc_url ? 'Uploaded' : 'Missing'],
+        ['Customer Signature', bookingData.customer_sign_url ? 'Uploaded' : 'Missing']
       ];
 
-      docsSummary.forEach(([docName, statusText], idx) => {
-        drawRow(docName, statusText, idx % 2 === 1);
+      docsSummary.forEach(([docName, statusText], index) => {
+        drawRow(docName, statusText, index % 2 === 1);
       });
 
-      // Footer / Acknowledgement Box
+      // Acknowledgement box
       y += 8;
+      ensureSpace(23);
       doc.setDrawColor(203, 213, 225);
       doc.setFillColor(254, 249, 195);
       doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
@@ -568,14 +787,13 @@
       doc.setFontSize(8.8);
       doc.text('Note:', margin + 4, y + 6);
       doc.setFont('helvetica', 'normal');
-      doc.text(
+      const noteLines = doc.splitTextToSize(
         'This is a system-generated booking receipt from M/s. SRI RUDHRA SOLAR SOLUTIONS. Please retain this receipt for future correspondence and subsidy processing.',
-        margin + 14,
-        y + 6,
-        { maxWidth: contentWidth - 18 }
+        contentWidth - 21
       );
+      doc.text(noteLines, margin + 14, y + 6);
 
-      // Bottom Signature Line
+      // Footer on the final page
       const footerY = 282;
       doc.setDrawColor(148, 163, 184);
       doc.line(margin, footerY - 6, pageWidth - margin, footerY - 6);
@@ -589,8 +807,14 @@
     }
 
     async function uploadFileToBucket(file, folder) {
-      const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-zA-Z0-9]/g, '');
-      const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      if (!file) {
+        throw new Error(`Please select the required ${folder.replace('_', ' ')} document.`);
+      }
+
+      const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-zA-Z0-9]/g, '') || 'bin';
+      const safeFileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${folder}/${safeFileName}`;
+
       const { error: uploadError } = await supabaseClient.storage
         .from(STORAGE_BUCKET)
         .upload(path, file, { upsert: false });
@@ -604,22 +828,32 @@
       return { path, publicUrl: data.publicUrl };
     }
 
-    document.getElementById('reDownloadBtn').addEventListener('click', () => {
-      if (lastSubmittedReceiptData) {
-        generateAndDownloadReceipt(lastSubmittedReceiptData);
+    // Re-download the most recently generated receipt without submitting again.
+    document.getElementById('reDownloadBtn').addEventListener('click', async () => {
+      if (!lastSubmittedReceiptData) return;
+      const button = document.getElementById('reDownloadBtn');
+      button.disabled = true;
+      button.textContent = 'Preparing PDF...';
+      try {
+        await generateAndDownloadReceipt(lastSubmittedReceiptData);
+      } catch (error) {
+        showStatus(`Could not generate receipt: ${error.message}`, 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Download Receipt Again (PDF)';
       }
     });
 
-    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    document.getElementById('bookingForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-      const form = e.target;
+      const form = event.currentTarget;
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
 
-      // Extra strict check to ensure every single input & file is provided
+      // Strict check for every required text field, select, and file input.
       const allRequiredFields = form.querySelectorAll('input[required], select[required]');
       for (const field of allRequiredFields) {
         if (field.type === 'file') {
@@ -628,7 +862,7 @@
             field.focus();
             return;
           }
-        } else if (!field.value || !field.value.trim()) {
+        } else if (!String(field.value || '').trim()) {
           showStatus('Please fill in all mandatory fields before submitting.', 'error');
           field.focus();
           return;
@@ -643,13 +877,19 @@
       showStatus('', '');
 
       const uploadedPaths = [];
+      let bookingSaved = false;
 
       try {
+        if (!window.supabase || !supabaseClient) {
+          throw new Error('Supabase library is unavailable. Check your internet connection.');
+        }
+
         const docUrls = {};
 
+        // Upload all six documents before inserting the booking row.
         for (const item of UPLOAD_MAP) {
           const input = document.getElementById(item.inputId);
-          const file = input.files[0];
+          const file = input.files && input.files[0];
           const uploaded = await uploadFileToBucket(file, item.folder);
           uploadedPaths.push(uploaded.path);
           docUrls[item.column] = uploaded.publicUrl;
@@ -661,6 +901,7 @@
           full_name: document.getElementById('full_name').value.trim(),
           mobile_no: document.getElementById('mobile_no').value.trim(),
           email_id: document.getElementById('email_id').value.trim(),
+          electricity_consumer_no: document.getElementById('electricity_consumer_no').value.trim(),
           house_no: document.getElementById('house_no').value.trim(),
           village: document.getElementById('village').value.trim(),
           mandal: document.getElementById('mandal').value.trim(),
@@ -668,10 +909,9 @@
           district: document.getElementById('district').value.trim(),
           state: document.getElementById('state').value.trim(),
           aadhar_no: document.getElementById('aadhar_no').value.trim(),
-          electricity_consumer_no: document.getElementById('electricity_consumer_no').value.trim(),
+          pan_no: document.getElementById('pan_no').value.trim().toUpperCase(),
           bank_ac_no: document.getElementById('bank_ac_no').value.trim(),
           ifsc_code: document.getElementById('ifsc_code').value.trim().toUpperCase(),
-          pan_no: document.getElementById('pan_no').value.trim().toUpperCase(),
           aadhar_doc_url: docUrls.aadhar_doc_url,
           pan_doc_url: docUrls.pan_doc_url,
           bank_doc_url: docUrls.bank_doc_url,
@@ -687,6 +927,7 @@
           .select();
 
         if (insertError) throw insertError;
+        bookingSaved = true;
 
         const savedRecord = (insertedRows && insertedRows[0]) || payload;
         lastSubmittedReceiptData = {
@@ -699,36 +940,63 @@
             : new Date().toLocaleString('en-IN')
         };
 
+        // Generate the receipt after the database confirms the booking was saved.
         await generateAndDownloadReceipt(lastSubmittedReceiptData);
 
         form.reset();
         showStatus('Booking submitted successfully! Your acknowledgement receipt PDF has been downloaded automatically.', 'success');
         receiptActions.style.display = 'flex';
-      } catch (err) {
-        if (uploadedPaths.length > 0) {
-          await supabaseClient.storage.from(STORAGE_BUCKET).remove(uploadedPaths).catch(() => {});
+      } catch (error) {
+        console.error('Booking submission failed:', error);
+
+        if (bookingSaved) {
+          // The row is already safely stored. Keep its uploaded documents and
+          // let the customer retry the PDF download without submitting again.
+          form.reset();
+          receiptActions.style.display = 'flex';
+          showStatus(
+            `Booking saved successfully, but the receipt could not be generated: ${error.message || 'Unknown error'}. Use the Download Receipt Again button.`,
+            'error'
+          );
+        } else {
+          // Only remove uploaded files when the booking row was not saved.
+          if (uploadedPaths.length > 0) {
+            const { error: cleanupError } = await supabaseClient.storage
+              .from(STORAGE_BUCKET)
+              .remove(uploadedPaths);
+            if (cleanupError) {
+              console.warn('Some uploaded files could not be removed:', cleanupError.message);
+            }
+          }
+          showStatus(`Submission failed: ${error.message || 'Unknown error'}`, 'error');
         }
-        showStatus(`Submission failed: ${err.message}`, 'error');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'SUBMIT BOOKING & DOWNLOAD RECEIPT';
       }
     });
-  </script>
-    <script>
-    document.addEventListener("contextmenu", e => e.preventDefault());
 
-    document.addEventListener("keydown", function(e) {
-        if (
-            e.key === "F12" ||
-            (e.ctrlKey && e.shiftKey &&
-            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-            (e.ctrlKey && e.key.toUpperCase() === "U")
-        ) {
-            e.preventDefault();
-        }
+    // Optional convenience: uppercase PAN and IFSC as the user types.
+    document.getElementById('pan_no').addEventListener('input', (event) => {
+      event.target.value = event.target.value.toUpperCase();
     });
-    </script>
-<script src="database_script.js"></script>
+    document.getElementById('ifsc_code').addEventListener('input', (event) => {
+      event.target.value = event.target.value.toUpperCase();
+    });
+
+    // The following shortcuts/context-menu restriction is only a UI deterrent;
+    // it does not secure the source code, Supabase project, or uploaded documents.
+    document.addEventListener('contextmenu', (event) => event.preventDefault());
+    document.addEventListener('keydown', (event) => {
+      const key = event.key.toUpperCase();
+      if (
+        event.key === 'F12' ||
+        (event.ctrlKey && event.shiftKey && ['I', 'J', 'C'].includes(key)) ||
+        (event.ctrlKey && key === 'U')
+      ) {
+        event.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
