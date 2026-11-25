@@ -1,401 +1,734 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUDHRA Solar Panel Booking</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --primary: #f59e0b;
-            --primary-dark: #d97706;
-            --secondary: #0f172a;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --border: #cbd5e1;
-        }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); margin: 0; padding: 0; color: #1e293b; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RUDHRA Solar - Customer Booking Form</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-dark: #d97706;
+      --secondary: #0f172a;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #cbd5e1;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
 
-        /* Fixed Top Header with DP */
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: var(--secondary);
-            color: white;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-        .fixed-header img {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-            background: #fff;
-        }
-        .fixed-header h1 {
-            margin: 0;
-            font-size: 1.35rem;
-            letter-spacing: 0.5px;
-        }
-        .fixed-header span { color: var(--primary); }
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        /* Main Form Container */
-        .container {
-            max-width: 850px;
-            margin: 100px auto 40px;
-            background: var(--card);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        h2.section-title {
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 6px;
-            margin-top: 25px;
-            margin-bottom: 18px;
-            font-size: 1.1rem;
-            color: var(--secondary);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-        }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: #334155; }
-        input, select {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.95rem;
-            background: #fff;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-        }
-        input[type="file"] { padding: 7px; background: #f1f5f9; }
-        .submit-btn {
-            margin-top: 30px;
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: var(--secondary);
-            font-weight: 700;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .submit-btn:hover { background: var(--primary-dark); color: #fff; }
-        .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
-        #statusMsg {
-            margin-top: 15px;
-            text-align: center;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 6px;
-            display: none;
-        }
-    </style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .header {
+      background: var(--secondary);
+      color: #ffffff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .header img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      background: #ffffff;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .header h1 span {
+      color: var(--primary);
+    }
+
+    .header small {
+      color: #cbd5e1;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 28px auto 48px;
+      padding: 0 16px;
+    }
+
+    .form-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    .required-note {
+      margin: 0 0 16px;
+      font-size: 0.85rem;
+      color: #b45309;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .section-title {
+      margin: 22px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary);
+      font-size: 1.05rem;
+      color: var(--secondary);
+    }
+
+    .section-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    .form-group label .req {
+      color: #dc2626;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      background: #ffffff;
+    }
+
+    .form-group input[type="file"] {
+      padding: 7px;
+      background: #f8fafc;
+      font-size: 0.84rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-dark);
+    }
+
+    .submit-btn {
+      margin-top: 26px;
+      width: 100%;
+      padding: 13px;
+      background: var(--primary);
+      color: var(--secondary);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+      color: #ffffff;
+    }
+
+    .submit-btn:disabled {
+      background: #94a3b8;
+      color: #ffffff;
+      cursor: wait;
+    }
+
+    .status-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .status-box.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .status-box.error {
+      display: block;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    .receipt-actions {
+      margin-top: 12px;
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .receipt-btn {
+      padding: 10px 16px;
+      background: var(--secondary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .receipt-btn:hover {
+      background: #1e293b;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Fixed Header with DP -->
-    <header class="fixed-header">
-        <img src="rudhra_logo.jpeg" alt="RUDHRA Solar Logo">
-        <div>
-            <h1><span>RUDHRA</span> SOLAR PANEL BOOKING</h1>
-            <small style="color: #cbd5e1;">Clean Energy Registration Portal</small>
-        </div>
-    </header>
-
-    <div class="container">
-        <form id="solarForm">
-            <h2 class="section-title">1. System & Agent Selection</h2>
-            <div class="grid">
-                <div class="form-group">
-                    <label>Required Capacity *</label>
-                    <select id="capacity" required>
-                        <option value="">-- Select Capacity --</option>
-                        <option value="3kW">3 kW</option>
-                        <option value="5kW">5 kW</option>
-                        <option value="10kW">10 kW</option>
-                        <option value="15kW">15 kW</option>
-                        <option value="20kW">20 kW</option>
-                        <option value="30kW">30 kW</option>
-                        <option value="50kW">50 kW</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Agent Selection *</label>
-                    <select id="agent_name" required>
-                        <option value="">-- Select Agent --</option>
-                        <option value="RAVI">RAVI(9110328712)</option>
-                        <option value="RAGAVENDRA">RAGAVENDRA(9052686597)</option>
-                        <option value="SANTHOSH">SANTHOSH(9063663725)</option>
-                        <option value="ASHOK">ASHOK(9951912096)</option>
-                        <option value="ANIL">ANIL</option>
- 			<option value="SATHYAM">SATHYAM(7569401050)</option>
-                    </select>
-                </div>
-            </div>
-
-            <h2 class="section-title">2. Customer Personal Details</h2>
-            <div class="grid">
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" id="full_name" placeholder="Enter Full Name" required>
-                </div>
-                <div class="form-group">
-                    <label>Mobile Number *</label>
-                    <input type="tel" id="mobile_no" pattern="[0-9]{10}" placeholder="10-digit Mobile No" required>
-                </div>
-                <div class="form-group">
-                    <label>Email ID</label>
-                    <input type="email" id="email_id" placeholder="example@email.com">
-                </div>
-            </div>
-
-            <h2 class="section-title">3. Installation Address</h2>
-            <div class="grid">
-                <div class="form-group">
-                    <label>House No *</label>
-                    <input type="text" id="house_no" placeholder="D.No / Flat No" required>
-                </div>
-                <div class="form-group">
-                    <label>Village / Town *</label>
-                    <input type="text" id="village" placeholder="Village Name" required>
-                </div>
-                <div class="form-group">
-                    <label>Mandal *</label>
-                    <input type="text" id="mandal" placeholder="Mandal Name" required>
-                </div>
-                <div class="form-group">
-                    <label>Pincode *</label>
-                    <input type="text" id="pincode" pattern="[0-9]{6}" placeholder="6-digit Pincode" required>
-                </div>
-                <div class="form-group">
-                    <label>District *</label>
-                    <input type="text" id="district" placeholder="District Name" required>
-                </div>
-                <div class="form-group">
-                    <label>State *</label>
-                    <select id="state" required>
-                        <option value="">-- Select State --</option>
-                        <option value="Telangana">Telangana</option>
-                        <option value="Andhra Pradesh">Andhra Pradesh</option>
-                        <option value="Karnataka">Karnataka</option>
-                        <option value="Tamil Nadu">Tamil Nadu</option>
-                        <option value="Maharashtra">Maharashtra</option>
-                        <option value="Kerala">Kerala</option>
-                        <option value="Odisha">Odisha</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-            </div>
-
-            <h2 class="section-title">4. KYC, Bank & Site Documents</h2>
-            <div class="grid">
-                <div class="form-group">
-                    <label>Aadhar Number *</label>
-                    <input type="text" id="aadhar_no" pattern="[0-9]{12}" placeholder="12-digit Aadhar No" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload Aadhar Card *</label>
-                    <input type="file" id="aadhar_file" accept="image/*,.pdf" required>
-                </div>
-                <div class="form-group">
-                    <label>Electricity Consumer Number *</label>
-                    <input type="text" id="electricity_consumer_no" placeholder="USC / Service Number" required>
-                </div>
-                <div class="form-group">
-                    <label>Bank Account Number *</label>
-                    <input type="text" id="bank_ac_no" placeholder="Bank A/C No" required>
-                </div>
-                <div class="form-group">
-                    <label>IFSC Code *</label>
-                    <input type="text" id="ifsc_code" placeholder="e.g., SBIN0001234" style="text-transform: uppercase;" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload Bank Passbook / Cancelled Cheque *</label>
-                    <input type="file" id="bank_file" accept="image/*,.pdf" required>
-                </div>
-                <div class="form-group">
-                    <label>PAN Number *</label>
-                    <input type="text" id="pan_no" placeholder="e.g., ABCDE1234F" style="text-transform: uppercase;" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload PAN Card *</label>
-                    <input type="file" id="pan_file" accept="image/*,.pdf" required>
-                </div>
-                <div class="form-group">
-                    <label>Site Installation Photo *</label>
-                    <input type="file" id="site_photo" accept="image/*" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload House Tax Receipt / Document (Optional)</label>
-                    <input type="file" id="house_tax_file" accept="image/*,.pdf">
-                    <small style="color:#64748b;margin-top:5px;">Upload a house/property tax receipt or document (image or PDF).</small>
-                </div>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn">SUBMIT BOOKING</button>
-            <div id="statusMsg"></div>
-        </form>
+  <header class="header">
+    <img id="brandLogo" src="rudhralogo.jpeg" alt="RUDHRA Logo" />
+    <div>
+      <h1><span>RUDHRA</span> SOLAR BOOKING FORM</h1>
+      <small>Submit Rooftop Solar Booking Details &amp; Documents</small>
     </div>
+  </header>
 
-    <script>
-        // REPLACE WITH YOUR SUPABASE PROJECT DETAILS
-        const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <main class="container">
+    <form class="form-card" id="bookingForm">
+      <div class="required-note">All fields and document uploads marked with * are mandatory.</div>
 
-        async function uploadFile(fileInputId, folderName) {
-            const fileInput = document.getElementById(fileInputId);
-            const file = fileInput.files[0];
-            if (!file) return null;
+      <h2 class="section-title">Booking &amp; Customer Details</h2>
+      <div class="grid">
+        <div class="form-group">
+          <label for="capacity">Capacity <span class="req">*</span></label>
+          <select id="capacity" required>
+            <option value="">-- Select Capacity --</option>
+            <option value="3kW">3 kW</option>
+            <option value="5kW">5 kW</option>
+            <option value="10kW">10 kW</option>
+            <option value="15kW">15 kW</option>
+            <option value="20kW">20 kW</option>
+            <option value="30kW">30 kW</option>
+            <option value="50kW">50 kW</option>
+          </select>
+        </div>
 
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${folderName}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+        <div class="form-group">
+          <label for="agent_name">Agent Name <span class="req">*</span></label>
+          <select id="agent_name" required>
+            <option value="">-- Select Agent --</option>
+            <option value="RAVI">RAVI</option>
+            <option value="RAGAVENDRA">RAGAVENDRA</option>
+            <option value="SANTHOS">SANTHOS</option>
+            <option value="ASHOK">ASHOK</option>
+            <option value="ANIL">ANIL</option>
+          </select>
+        </div>
 
-            const { data, error } = await supabaseClient.storage
-                .from('rudhra-docs')
-                .upload(fileName, file);
+        <div class="form-group">
+          <label for="full_name">Full Name <span class="req">*</span></label>
+          <input type="text" id="full_name" required placeholder="Enter full name" />
+        </div>
 
-            if (error) throw error;
+        <div class="form-group">
+          <label for="mobile_no">Mobile Number <span class="req">*</span></label>
+          <input type="tel" id="mobile_no" required pattern="[0-9]{10}" maxlength="10" title="Enter a valid 10-digit mobile number" placeholder="10-digit mobile number" />
+        </div>
 
-            const { data: urlData } = supabaseClient.storage
-                .from('rudhra-docs')
-                .getPublicUrl(fileName);
+        <div class="form-group">
+          <label for="email_id">Email ID <span class="req">*</span></label>
+          <input type="email" id="email_id" required placeholder="Enter email address" />
+        </div>
 
-            return urlData.publicUrl;
+        <div class="form-group">
+          <label for="electricity_consumer_no">Electricity Consumer No <span class="req">*</span></label>
+          <input type="text" id="electricity_consumer_no" required placeholder="Enter consumer number" />
+        </div>
+      </div>
+
+      <h2 class="section-title">Address Details</h2>
+      <div class="grid">
+        <div class="form-group">
+          <label for="house_no">House No <span class="req">*</span></label>
+          <input type="text" id="house_no" required placeholder="House / Door No" />
+        </div>
+
+        <div class="form-group">
+          <label for="village">Village / Town <span class="req">*</span></label>
+          <input type="text" id="village" required placeholder="Village or town" />
+        </div>
+
+        <div class="form-group">
+          <label for="mandal">Mandal <span class="req">*</span></label>
+          <input type="text" id="mandal" required placeholder="Mandal" />
+        </div>
+
+        <div class="form-group">
+          <label for="district">District <span class="req">*</span></label>
+          <input type="text" id="district" required placeholder="District" />
+        </div>
+
+        <div class="form-group">
+          <label for="state">State <span class="req">*</span></label>
+          <input type="text" id="state" required placeholder="State" />
+        </div>
+
+        <div class="form-group">
+          <label for="pincode">PIN Code <span class="req">*</span></label>
+          <input type="text" id="pincode" required pattern="[0-9]{6}" maxlength="6" title="Enter a valid 6-digit PIN code" placeholder="6-digit PIN code" />
+        </div>
+      </div>
+
+      <h2 class="section-title">KYC &amp; Bank Details</h2>
+      <div class="grid">
+        <div class="form-group">
+          <label for="aadhar_no">Aadhar Number <span class="req">*</span></label>
+          <input type="text" id="aadhar_no" required pattern="[0-9]{12}" maxlength="12" title="Enter a valid 12-digit Aadhar number" placeholder="12-digit Aadhar number" />
+        </div>
+
+        <div class="form-group">
+          <label for="pan_no">PAN Number <span class="req">*</span></label>
+          <input type="text" id="pan_no" required maxlength="10" style="text-transform: uppercase;" placeholder="Enter PAN number" />
+        </div>
+
+        <div class="form-group">
+          <label for="bank_ac_no">Bank Account No <span class="req">*</span></label>
+          <input type="text" id="bank_ac_no" required placeholder="Enter bank account number" />
+        </div>
+
+        <div class="form-group">
+          <label for="ifsc_code">IFSC Code <span class="req">*</span></label>
+          <input type="text" id="ifsc_code" required maxlength="11" style="text-transform: uppercase;" placeholder="Enter IFSC code" />
+        </div>
+      </div>
+
+      <h2 class="section-title">Upload Documents &amp; Signature</h2>
+      <div class="grid">
+        <div class="form-group">
+          <label for="aadhar_doc">Aadhar Document <span class="req">*</span></label>
+          <input type="file" id="aadhar_doc" required accept="image/*,.pdf" />
+        </div>
+
+        <div class="form-group">
+          <label for="pan_doc">PAN Document <span class="req">*</span></label>
+          <input type="file" id="pan_doc" required accept="image/*,.pdf" />
+        </div>
+
+        <div class="form-group">
+          <label for="bank_doc">Bank Proof (Passbook / Cheque) <span class="req">*</span></label>
+          <input type="file" id="bank_doc" required accept="image/*,.pdf" />
+        </div>
+
+        <div class="form-group">
+          <label for="site_photo">Site Photo <span class="req">*</span></label>
+          <input type="file" id="site_photo" required accept="image/*" />
+        </div>
+
+        <div class="form-group">
+          <label for="house_tax_doc">House Tax Document <span class="req">*</span></label>
+          <input type="file" id="house_tax_doc" required accept="image/*,.pdf" />
+        </div>
+
+        <div class="form-group">
+          <label for="customer_sign_doc">Customer Signature <span class="req">*</span></label>
+          <input type="file" id="customer_sign_doc" required accept="image/*,.pdf" />
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">SUBMIT BOOKING &amp; DOWNLOAD RECEIPT</button>
+      <div class="status-box" id="statusBox" role="status"></div>
+      <div class="receipt-actions" id="receiptActions">
+        <button type="button" class="receipt-btn" id="reDownloadBtn">Download Receipt Again (PDF)</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://gzqevoudbwttcdeglish.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_ySvuOYNcs37aTcyYjJW76Q_cWF5x0qN';
+    const STORAGE_BUCKET = 'rudhra-docs';
+    const BOOKINGS_TABLE = 'rudhra_solar_bookings';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const UPLOAD_MAP = [
+      { inputId: 'aadhar_doc', column: 'aadhar_doc_url', folder: 'aadhar', label: 'Aadhar Document' },
+      { inputId: 'pan_doc', column: 'pan_doc_url', folder: 'pan', label: 'PAN Document' },
+      { inputId: 'bank_doc', column: 'bank_doc_url', folder: 'bank', label: 'Bank Proof' },
+      { inputId: 'site_photo', column: 'site_photo_url', folder: 'site', label: 'Site Photo' },
+      { inputId: 'house_tax_doc', column: 'house_tax_doc_url', folder: 'house_tax', label: 'House Tax Document' },
+      { inputId: 'customer_sign_doc', column: 'customer_sign_url', folder: 'customer_sign', label: 'Customer Signature' }
+    ];
+
+    let lastSubmittedReceiptData = null;
+
+    function showStatus(message, type) {
+      const box = document.getElementById('statusBox');
+      if (!message) {
+        box.style.display = 'none';
+        box.textContent = '';
+        box.className = 'status-box';
+        return;
+      }
+      box.textContent = message;
+      box.className = `status-box ${type}`;
+      box.style.display = 'block';
+    }
+
+    async function loadLogoDataUrl() {
+      try {
+        const res = await fetch('rudhralogo.jpeg');
+        if (!res.ok) return null;
+        const blob = await res.blob();
+        return await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(blob);
+        });
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function generateAndDownloadReceipt(bookingData) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const pageWidth = 210;
+      const margin = 14;
+      const contentWidth = pageWidth - margin * 2;
+
+      // Top Brand Banner
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 38, 'F');
+
+      // Accent Stripe
+      doc.setFillColor(245, 158, 11);
+      doc.rect(0, 38, pageWidth, 2.5, 'F');
+
+      // Optional Company Logo
+      const logoDataUrl = await loadLogoDataUrl();
+      let textStartX = margin;
+      if (logoDataUrl) {
+        try {
+          doc.addImage(logoDataUrl, 'JPEG', margin, 6, 25, 25);
+          textStartX = margin + 30;
+        } catch (_) {}
+      }
+
+      doc.setTextColor(245, 158, 11);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(17);
+      doc.text('M/s. SRI RUDHRA SOLAR SOLUTIONS', textStartX, 15);
+
+      doc.setTextColor(226, 232, 240);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.8);
+      doc.text('HNO: 1-7-28/12/1, Near SBI Bank, Narsampeta Main Road,', textStartX, 21.5);
+      doc.text('Dist: Mahabubabad - 506101, Telangana | PM - Surya Ghar: Muft Bijli Yojana', textStartX, 26.8);
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('SOLAR BOOKING ACKNOWLEDGEMENT RECEIPT', textStartX, 33.5);
+
+      // Receipt Meta Bar
+      let y = 47;
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(203, 213, 225);
+      doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
+
+      const receiptNo = bookingData.receipt_no || `RSS-${Date.now().toString().slice(-8)}`;
+      const submittedAt = bookingData.submitted_at || new Date().toLocaleString('en-IN');
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Receipt / Ref No: ${receiptNo}`, margin + 4, y + 6.5);
+      doc.text(`Status: ${bookingData.status || 'Pending'}`, pageWidth - margin - 4, y + 6.5, { align: 'right' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Date & Time: ${submittedAt}`, margin + 4, y + 12.5);
+      doc.text(`Assigned Agent: ${bookingData.agent_name}`, pageWidth - margin - 4, y + 12.5, { align: 'right' });
+
+      y += 23;
+
+      const drawSectionHeader = (title) => {
+        doc.setFillColor(15, 23, 42);
+        doc.rect(margin, y, contentWidth, 7.5, 'F');
+        doc.setTextColor(245, 158, 11);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.8);
+        doc.text(title, margin + 3.5, y + 5.2);
+        y += 7.5;
+      };
+
+      const drawRow = (label, value, isAlt = false) => {
+        const displayValue = String(value || 'N/A');
+        const wrappedLines = doc.splitTextToSize(displayValue, contentWidth - 68);
+        const rowHeight = Math.max(7.5, wrappedLines.length * 4.8 + 3);
+
+        doc.setFillColor(isAlt ? 248 : 255, isAlt ? 250 : 255, isAlt ? 252 : 255);
+        doc.setDrawColor(226, 232, 240);
+        doc.rect(margin, y, contentWidth, rowHeight, 'FD');
+
+        doc.setTextColor(51, 65, 85);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.2);
+        doc.text(label, margin + 3.5, y + 5);
+
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'normal');
+        doc.text(wrappedLines, margin + 65, y + 5);
+
+        y += rowHeight;
+      };
+
+      // Section 1: Customer & Solar System Details
+      drawSectionHeader('1. CUSTOMER & SYSTEM BOOKING DETAILS');
+      drawRow('Customer Full Name', bookingData.full_name, false);
+      drawRow('Mobile Number', bookingData.mobile_no, true);
+      drawRow('Email ID', bookingData.email_id, false);
+      drawRow('Selected Plant Capacity', bookingData.capacity, true);
+      drawRow('Electricity Consumer No.', bookingData.electricity_consumer_no, false);
+      drawRow('Assigned Executive / Agent', bookingData.agent_name, true);
+
+      y += 5;
+
+      // Section 2: Installation Address
+      drawSectionHeader('2. INSTALLATION SITE ADDRESS');
+      const fullAddress = `${bookingData.house_no}, ${bookingData.village}, Mandal: ${bookingData.mandal}, Dist: ${bookingData.district}, ${bookingData.state} - ${bookingData.pincode}`;
+      drawRow('Complete Address', fullAddress, false);
+
+      y += 5;
+
+      // Section 3: KYC & Bank Details
+      drawSectionHeader('3. KYC & BANK ACCOUNT DETAILS');
+      drawRow('Aadhar Number', bookingData.aadhar_no, false);
+      drawRow('PAN Number', bookingData.pan_no, true);
+      drawRow('Bank Account Number', bookingData.bank_ac_no, false);
+      drawRow('IFSC Code', bookingData.ifsc_code, true);
+
+      y += 5;
+
+      // Section 4: Uploaded Documents Checklist
+      drawSectionHeader('4. SUBMITTED DOCUMENTS VERIFICATION');
+      const docsSummary = [
+        ['Aadhar Card Document', bookingData.aadhar_doc_url ? 'Uploaded & Attached' : 'Missing'],
+        ['PAN Card Document', bookingData.pan_doc_url ? 'Uploaded & Attached' : 'Missing'],
+        ['Bank Proof Document', bookingData.bank_doc_url ? 'Uploaded & Attached' : 'Missing'],
+        ['Site Installation Photo', bookingData.site_photo_url ? 'Uploaded & Attached' : 'Missing'],
+        ['House Tax Document', bookingData.house_tax_doc_url ? 'Uploaded & Attached' : 'Missing'],
+        ['Customer Signature', bookingData.customer_sign_url ? 'Uploaded & Attached' : 'Missing']
+      ];
+
+      docsSummary.forEach(([docName, statusText], idx) => {
+        drawRow(docName, statusText, idx % 2 === 1);
+      });
+
+      // Footer / Acknowledgement Box
+      y += 8;
+      doc.setDrawColor(203, 213, 225);
+      doc.setFillColor(254, 249, 195);
+      doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
+      doc.setTextColor(113, 63, 18);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.8);
+      doc.text('Note:', margin + 4, y + 6);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        'This is a system-generated booking receipt from M/s. SRI RUDHRA SOLAR SOLUTIONS. Please retain this receipt for future correspondence and subsidy processing.',
+        margin + 14,
+        y + 6,
+        { maxWidth: contentWidth - 18 }
+      );
+
+      // Bottom Signature Line
+      const footerY = 282;
+      doc.setDrawColor(148, 163, 184);
+      doc.line(margin, footerY - 6, pageWidth - margin, footerY - 6);
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(8.5);
+      doc.text('Authorized Signatory - Sri Rudhra Solar Solutions', margin, footerY);
+      doc.text('Generated Automatically upon Submission', pageWidth - margin, footerY, { align: 'right' });
+
+      const safeName = (bookingData.full_name || 'Customer').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+      doc.save(`RUDHRA_Receipt_${safeName}.pdf`);
+    }
+
+    async function uploadFileToBucket(file, folder) {
+      const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-zA-Z0-9]/g, '');
+      const path = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, file, { upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(path);
+
+      return { path, publicUrl: data.publicUrl };
+    }
+
+    document.getElementById('reDownloadBtn').addEventListener('click', () => {
+      if (lastSubmittedReceiptData) {
+        generateAndDownloadReceipt(lastSubmittedReceiptData);
+      }
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Extra strict check to ensure every single input & file is provided
+      const allRequiredFields = form.querySelectorAll('input[required], select[required]');
+      for (const field of allRequiredFields) {
+        if (field.type === 'file') {
+          if (!field.files || field.files.length === 0) {
+            showStatus('Please upload all required documents and customer signature before submitting.', 'error');
+            field.focus();
+            return;
+          }
+        } else if (!field.value || !field.value.trim()) {
+          showStatus('Please fill in all mandatory fields before submitting.', 'error');
+          field.focus();
+          return;
+        }
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const receiptActions = document.getElementById('receiptActions');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading Documents & Generating Receipt...';
+      receiptActions.style.display = 'none';
+      showStatus('', '');
+
+      const uploadedPaths = [];
+
+      try {
+        const docUrls = {};
+
+        for (const item of UPLOAD_MAP) {
+          const input = document.getElementById(item.inputId);
+          const file = input.files[0];
+          const uploaded = await uploadFileToBucket(file, item.folder);
+          uploadedPaths.push(uploaded.path);
+          docUrls[item.column] = uploaded.publicUrl;
         }
 
-        document.getElementById('solarForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const statusMsg = document.getElementById('statusMsg');
+        const payload = {
+          capacity: document.getElementById('capacity').value,
+          agent_name: document.getElementById('agent_name').value,
+          full_name: document.getElementById('full_name').value.trim(),
+          mobile_no: document.getElementById('mobile_no').value.trim(),
+          email_id: document.getElementById('email_id').value.trim(),
+          house_no: document.getElementById('house_no').value.trim(),
+          village: document.getElementById('village').value.trim(),
+          mandal: document.getElementById('mandal').value.trim(),
+          pincode: document.getElementById('pincode').value.trim(),
+          district: document.getElementById('district').value.trim(),
+          state: document.getElementById('state').value.trim(),
+          aadhar_no: document.getElementById('aadhar_no').value.trim(),
+          electricity_consumer_no: document.getElementById('electricity_consumer_no').value.trim(),
+          bank_ac_no: document.getElementById('bank_ac_no').value.trim(),
+          ifsc_code: document.getElementById('ifsc_code').value.trim().toUpperCase(),
+          pan_no: document.getElementById('pan_no').value.trim().toUpperCase(),
+          aadhar_doc_url: docUrls.aadhar_doc_url,
+          pan_doc_url: docUrls.pan_doc_url,
+          bank_doc_url: docUrls.bank_doc_url,
+          site_photo_url: docUrls.site_photo_url,
+          house_tax_doc_url: docUrls.house_tax_doc_url,
+          customer_sign_url: docUrls.customer_sign_url,
+          status: 'Pending'
+        };
 
-            btn.disabled = true;
-            btn.innerText = 'Uploading Documents & Saving...';
-            statusMsg.style.display = 'none';
+        const { data: insertedRows, error: insertError } = await supabaseClient
+          .from(BOOKINGS_TABLE)
+          .insert([payload])
+          .select();
 
-            try {
-                // Upload all documents concurrently. House tax document is optional.
-                const [aadharUrl, bankUrl, panUrl, siteUrl, houseTaxUrl] = await Promise.all([
-                    uploadFile('aadhar_file', 'aadhar'),
-                    uploadFile('bank_file', 'bank'),
-                    uploadFile('pan_file', 'pan'),
-                    uploadFile('site_photo', 'site'),
-                    uploadFile('house_tax_file', 'house_tax')
-                ]);
+        if (insertError) throw insertError;
 
-                const formData = {
-                    capacity: document.getElementById('capacity').value,
-                    agent_name: document.getElementById('agent_name').value,
-                    full_name: document.getElementById('full_name').value,
-                    mobile_no: document.getElementById('mobile_no').value,
-                    email_id: document.getElementById('email_id').value,
-                    house_no: document.getElementById('house_no').value,
-                    village: document.getElementById('village').value,
-                    mandal: document.getElementById('mandal').value,
-                    pincode: document.getElementById('pincode').value,
-                    district: document.getElementById('district').value,
-                    state: document.getElementById('state').value,
-                    aadhar_no: document.getElementById('aadhar_no').value,
-                    aadhar_doc_url: aadharUrl,
-                    electricity_consumer_no: document.getElementById('electricity_consumer_no').value,
-                    bank_ac_no: document.getElementById('bank_ac_no').value,
-                    ifsc_code: document.getElementById('ifsc_code').value.toUpperCase(),
-                    bank_doc_url: bankUrl,
-                    pan_no: document.getElementById('pan_no').value.toUpperCase(),
-                    pan_doc_url: panUrl,
-                    site_photo_url: siteUrl,
-                    house_tax_doc_url: houseTaxUrl
-                };
+        const savedRecord = (insertedRows && insertedRows[0]) || payload;
+        lastSubmittedReceiptData = {
+          ...savedRecord,
+          receipt_no: savedRecord.id
+            ? `RSS-${String(savedRecord.id).slice(0, 8).toUpperCase()}`
+            : `RSS-${Date.now().toString().slice(-8)}`,
+          submitted_at: savedRecord.created_at
+            ? new Date(savedRecord.created_at).toLocaleString('en-IN')
+            : new Date().toLocaleString('en-IN')
+        };
 
-                const { error } = await supabaseClient
-                    .from('rudhra_solar_bookings')
-                    .insert([formData]);
+        await generateAndDownloadReceipt(lastSubmittedReceiptData);
 
-                if (error) throw error;
-
-                statusMsg.style.display = 'block';
-                statusMsg.style.background = '#dcfce7';
-                statusMsg.style.color = '#166534';
-                statusMsg.innerText = '✅ Booking Submitted Successfully! RUDHRA Solar team will contact you soon.';
-                document.getElementById('solarForm').reset();
-
-            } catch (err) {
-                console.error(err);
-                statusMsg.style.display = 'block';
-                statusMsg.style.background = '#fee2e2';
-                statusMsg.style.color = '#991b1b';
-                statusMsg.innerText = '❌ Error: ' + err.message;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'SUBMIT BOOKING';
-            }
-        });
-    </script>
-
+        form.reset();
+        showStatus('Booking submitted successfully! Your acknowledgement receipt PDF has been downloaded automatically.', 'success');
+        receiptActions.style.display = 'flex';
+      } catch (err) {
+        if (uploadedPaths.length > 0) {
+          await supabaseClient.storage.from(STORAGE_BUCKET).remove(uploadedPaths).catch(() => {});
+        }
+        showStatus(`Submission failed: ${err.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'SUBMIT BOOKING & DOWNLOAD RECEIPT';
+      }
+    });
+  </script>
     <script>
-  // 1. Disable right-click context menu
-  document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-  });
+    document.addEventListener("contextmenu", e => e.preventDefault());
 
-  // 2. Block common inspection and view-source shortcuts
-  document.addEventListener('keydown', function (e) {
-    const key = e.key.toLowerCase();
-
-    // Block Ctrl+U / Cmd+U (View Page Source)
-    if ((e.ctrlKey || e.metaKey) && key === 'u') {
-      e.preventDefault();
-      return false;
-    }
-
-    // Block Ctrl+Shift+I / Cmd+Option+I (DevTools)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && key === 'i') {
-      e.preventDefault();
-      return false;
-    }
-
-    // Block Ctrl+Shift+J / Cmd+Option+J (Console)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && key === 'j') {
-      e.preventDefault();
-      return false;
-    }
-
-    // Block Ctrl+Shift+C / Cmd+Option+C (Inspect Element mode)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && key === 'c') {
-      e.preventDefault();
-      return false;
-    }
-
-    // Block Ctrl+S / Cmd+S (Save Page)
-    if ((e.ctrlKey || e.metaKey) && key === 's') {
-      e.preventDefault();
-      return false;
-    }
-
-    // Block F12
-    if (e.key === 'F12') {
-      e.preventDefault();
-      return false;
-    }
-  });
-</script>
+    document.addEventListener("keydown", function(e) {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey &&
+            ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+            (e.ctrlKey && e.key.toUpperCase() === "U")
+        ) {
+            e.preventDefault();
+        }
+    });
+    </script>
+<script src="database_script.js"></script>
 </body>
 </html>
